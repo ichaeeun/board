@@ -1,0 +1,11 @@
+# 데이터베이스 접속 정보 
+# db정보를 변경할 때, 여기서 통일적으로 변경하면 된다. 
+driver=oracle.jdbc.driver.OracleDriver
+dburl=jdbc:oracle:thin:@localhost:1521:xe
+user2=scott
+pass=tiger 
+# driver dbrul user2 pass 
+# 파일 서버 정보 upload uploadTmp
+upload=/Users/workspace/board/WebContent/z01_upload/
+uploadTmp=/Users/workspace/.metadata/.plugins/org.eclipse.wst.server.core/tmp0/wtpwebapps/board/z01_upload/
+

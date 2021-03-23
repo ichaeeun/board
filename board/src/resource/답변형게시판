@@ -1,0 +1,175 @@
+# 답변형 게시판 
+1. 주요기능 
+	1) 전체글 리스트 
+		block단위 페이징 처리 
+			- 한번에 보일 데이터 건수 설정 3/5/10/20 
+			  [1][2][3][4][5]>>
+			<<[6][7][8][9][10]>>
+		검색 처리 
+		계층형 답글 달기 처리 
+	2) 글등록 
+		첨부파일 처리(다중파일) 
+	3) 상세화면
+		수정 
+		삭제 
+		파일다운로드
+		답글 
+2. 개발 순서 
+	1) DB 설게 및 테이블 구성 
+		board: 번호, 상위번호, 제목, 작성자, 등록일, 수정일, 조회수, 내용 
+				no  refno  subject writer regdte uptdte readcnt content 
+		boardfile : 번호, 파일명, 경로명, 내용, 생성일 
+					no  fname   pathname content credte 
+		board_seq(sequence만들기)
+		
+	2) vo 작성 
+		리스트/입력 처리 vo 
+		조회처리 및 페이지처리 관려 vo 
+		첨부파일 vo 
+	3) 기본 조회 리스트 작성하기 
+		select * from board 
+		where subject like '%%' 
+		and writer '%%' 
+		dao 
+		mapper 
+		service 
+		controller 
+		jsp(화면출력) 
+	4) 등록처리	
+		sql : insert into board values()
+			  insert into boardFile values() 
+		dao 
+		mapper
+		service
+			첨부파일 로직 처리 
+		controlller
+		jsp (초기화면 구성) 
+			첨부파일 위한 form 속성 enctype을 설정 
+		vo multipartfile 객체 활용처리 
+		container에 파일 업로드 등록 
+	5) 상세화면 처리 
+		- 상세화면보기 
+		- 수정 
+		- 삭제 
+		- 답글 
+			답글 처리 순간 데이터 구조가 계층형 
+	6) 계층형 리스트 처리하기 
+		- 계층형 sql 작성 
+		- 조회 vo 할당(BoardSch 추가) 
+			전체글수
+			페이지당 보일 데이터 건수 
+			페이지수 
+			시작번호 
+			마지막 번호 
+		- service 단에서 business 로직 처리 
+		- 계층적 리스트 및 페이징 처리 
+			페이지당 데이터 건수 select[3/5/10/20]
+			클릭한 현재 페이지 번호 [1][2][3][4][5]
+			페이지블럭 처리 
+		
+# DB 설계 및 VO 만들기 
+	1) DB 설게 및 테이블 구성 
+		board: 번호, 상위번호, 제목, 작성자, 등록일, 수정일, 조회수, 내용 
+				no  refno  subject writer regdte uptdte readcnt content 
+		boardfile : 번호, 파일명, 경로명, 내용, 생성일 
+					no  fname   pathname content credte 
+		board_seq(sequence만들기)
+		
+	2) vo 작성 
+		리스트/입력 처리 vo (board.z01_vo.Board) 
+		조회처리 및 페이지처리 관려 vo 
+		첨부파일 vo (board.z01_vo.BoardFile)
+	
+# 기본 조회 리스트 작성하기
+	1)sql 
+		select * from board 
+		where subject like '%%' 
+		and writer '%%' 
+		order by no desc 
+	2) dao 	
+		public ArrayList<Board> boardList(Board sch); 
+	3) mapper 
+	4) service 
+		A01_BoardService 
+	5) controller 
+		modelattribute 명 sch 
+		model명 boadList 
+	6) jsp(화면출력) 	
+	
+
+# 기본 정보 등록 하기 
+	1) list 화면에서 등록버튼 클릭 
+		/board.do?method=insForm으로 등록 화면 이동 
+	2) controller 등록화면 선언 
+	3) 등록 화면 a02_boardInsertjsp 
+		form 화면 구성 .. action /board.do?method=insert 
+		상위글번호(0,hidden), 글 제목, 작성자, 내용, 첨부파일 
+	4) 등록 sql 
+		INSERT INTO board values(board_seq.nextval,0,'첫번째 글','내용','홍길동',0,sysdate,sysdate)
+	5) dao 
+		public void insertBoard(Board insert); 
+	6) mapper.xml 작성 
+	7) service 
+	8) controller 	
+		등록 service 호출 
+	9) 화면 등록 완료 처리 메시지 출력 
+
+# 파일 업로드 처리 
+1. 다중 파일 업로드를 위한 화면 UI 구성(view) 
+	<input type="file" name="report"/> 
+2. form 객체의 속성 추가 처리 
+	<form enctype="multipart/form-data"
+3. container에 파일 업로드 view bean 추가 처리 
+	org.springframework.web.multipart.commons.CommonsMultipartResolver 
+4. VO에서 report라는 프로퍼티로 네트워크상(client ==> server) 전송 가능하게 해주는 
+	MultipartFile 객체를 속성 선언 
+	private MultipartFile[] report; 
+5. controller에서 파일이 전송되었는지 확인 
+6. service단에서 받은 MultipartFile을 File객체로 변환해서 
+	1) 특정 위치에 저장처리 
+		eclipse tomcat 웹 서비스 사용하기 때문 
+		- 임시 폴드: 우선 저장 
+		- 파일 다운로드할 폴더 : 임시 폴더에 있는 파일 추후 다운로드할 폴더에 복사 처리 
+							- info에 위치 설정 
+		- 다운로드 업로드 폴더 위치 지정 
+			
+	2) DB에 해당 파일 정보를 저장 처리 
+		- db 구조 만들기 
+			boardfile : 번호, 파일명, 경로명, 내용, 생성일 
+					no  fname   pathname content credte 
+			vo Boardfile 
+			
+		- sql 
+			insert into boardfile(board_seq.currval, #{fname},#{pathname},
+						#{content},sysdate) 
+		- dao 
+		- mapper 
+		- service 단에서 호출 처리 
+		
+		
+ex) 연습예제 
+1. 화면 및 DB구조 
+	-- content, fname
+	REATE TABLE fileexp(
+		content varchar2(200),
+		fname varchar2(100)
+	);
+	SELECT * FROM fileexp;
+2. sql 작성 
+	INSERT INTO fileexp values('파이','pi.jpg')
+3. vo 작성 
+	public class FileVo{
+		private String content;
+		private String fname;
+	}
+4. dao 작성 
+	public void insertFile(FileVo ins) 
+5. 공통 vo 등록 
+6. mapper.xml 
+7. service
+8. controller 호출 
+9. 조회 
+			
+		
+		
+		

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="${encoding}">
+<title>Insert title here</title>
+<link rel="stylesheet" 
+	href="/jspexp/a00_com/a00_com.css">
+<script type="text/javascript" src="/jspexp/a00_com/jquery-3.5.1.js"></script>
+<script type="text/javascript">
+/* 
+ 
+ 
+*/
+//
+	$$(document).ready(function(){
+		$$("h2").text("시작");
+	});
+</script>
+</head>
+<body>
+	<h2></h2>
+</body>
