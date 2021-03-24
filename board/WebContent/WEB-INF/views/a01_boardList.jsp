@@ -27,6 +27,13 @@
 	   $("#insBtn").click(function(){
     	  location.href="${path}/board.do?method=insForm";
 	   });
+	   
+	   $(".data").dblclick(function(){
+	  //   var no $(this).children().eq(0).text();
+		   var no = $(this).attr("id");
+		   location.href="${path}/board.do?method=detail&no="+no;
+	   })
+	   
    });
 </script>
 </head>
@@ -59,7 +66,7 @@
     </thead>
     <tbody>
       <c:forEach var ="b" items="${boardList }"	>
-      <tr class="text-center">
+      <tr class="text-center data" id="${b.no }">
         <td>${b.no }</td><td>${b.subject }</td><td>${b.writer }</td><td><fmt:formatDate value="${b.regdte }"/></td><td>${b.readcnt }</td>
       </tr>
       </c:forEach>

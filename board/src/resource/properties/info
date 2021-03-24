@@ -6,6 +6,5 @@ user2=scott
 pass=tiger 
 # driver dbrul user2 pass 
 # 파일 서버 정보 upload uploadTmp
-upload=/Users/workspace/board/WebContent/z01_upload/
+upload=/Users/ichaeeun/git/board/board/WebContent/z01_upload/
 uploadTmp=/Users/workspace/.metadata/.plugins/org.eclipse.wst.server.core/tmp0/wtpwebapps/board/z01_upload/
-

@@ -91,6 +91,8 @@
          	
          	
          <!-- 3. 파일다운로드뷰 viewer  -->
+         <bean id="downloadviewer" class="board.z02_util.FileDownloadViewer"/>
+         
          <!-- 4. 엑셀뷰 viewer -->
          <!-- 5. pdf뷰 viewer -->
 </beans>      

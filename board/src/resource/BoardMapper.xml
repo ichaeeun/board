@@ -24,6 +24,27 @@
 		insert into boardfile values(board_seq.currval, #{fname},#{pathname},
 						#{content},sysdate)
 	</insert>
+	
+	<!-- public Board getBoard(int no) -->
+	<select id="getBoard" resultType="board" parameterType="int">
+		select * from board where no = #{no}
+	</select>
+	
+	<!-- public ArrayList<BoardFile> getBoardFile(int no); 
+		 resultMap : ArrayList형태의 데이터 중에 column명과 property가 
+		 			 다를 때 활용 
+		 같을 때는 ArrayList<BoardFile>의 단위 객체인 resultType만으로도 
+		 할당이 가능하다. 
+	-->
+	<select id="getBoardFile" resultType="boardfile" parameterType="int">
+		select * from boardfile where no = #{no}
+	</select>
+	
+	<!-- public void uptReadCnt(int no); -->
+	<update id="uptReadCnt" parameterType="int">
+		update board set readcnt = readcnt+1 
+		where no = #{no}
+	</update>
 </mapper>
 
 

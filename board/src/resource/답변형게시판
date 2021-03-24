@@ -118,35 +118,135 @@
 1. 다중 파일 업로드를 위한 화면 UI 구성(view) 
 	<input type="file" name="report"/> 
 2. form 객체의 속성 추가 처리 
-	<form enctype="multipart/form-data"
+	<form enctype="multipart/form-data" method="post" 
 3. container에 파일 업로드 view bean 추가 처리 
 	org.springframework.web.multipart.commons.CommonsMultipartResolver 
 4. VO에서 report라는 프로퍼티로 네트워크상(client ==> server) 전송 가능하게 해주는 
 	MultipartFile 객체를 속성 선언 
 	private MultipartFile[] report; 
 5. controller에서 파일이 전송되었는지 확인 
+	report.getoriginalFilename();
 6. service단에서 받은 MultipartFile을 File객체로 변환해서 
 	1) 특정 위치에 저장처리 
 		eclipse tomcat 웹 서비스 사용하기 때문 
-		- 임시 폴드: 우선 저장 
-		- 파일 다운로드할 폴더 : 임시 폴더에 있는 파일 추후 다운로드할 폴더에 복사 처리 
-							- info에 위치 설정 
-		- 다운로드 업로드 폴더 위치 지정 
+		- 임시 폴드: 우선 저장(tmpUpload) - info에 위치 설정 
+		- 파일 다운로드할 폴더(upload): 임시 폴더에 있는 파일 추후 다운로드할 폴더에 복사 처리 
+							- info에 위치 설정. 절대위치 지정.  /Users/ichaeeun/git/board/board/WebContent/z01_upload
+		- 다운로드 업로드 폴더 위치 지정
+		- 임시폴더에 있는 모든 파일 삭제 (예외방지) 
+		- MultipartFile 객체(메모리로 파일정보) 
+			==> File 변환(메모리+하드웨어적으로 특정 위치에 파일을 저장) 
+			transferTo() 메서드 사용 
+		- 임시파일 ==> 업로드할 위치로 복사 
+			파일카피 정책으로는 기존파일이 있으면 덮어쓰기 처리 .. 
 			
 	2) DB에 해당 파일 정보를 저장 처리 
+		(상세화면에서 다운로드 처리를 위해 파일 정보 저장) 
 		- db 구조 만들기 
 			boardfile : 번호, 파일명, 경로명, 내용, 생성일 
 					no  fname   pathname content credte 
-			vo Boardfile 
+		- VO 만들기	vo Boardfile 
 			
 		- sql 
 			insert into boardfile(board_seq.currval, #{fname},#{pathname},
 						#{content},sysdate) 
+			board_seq.currval : 등록하는 main board테이블의 no와 동일하게 처리 
 		- dao 
-		- mapper 
+		- 공통 vo 마이바티즈 공통파일 등록, mapper.xml sql 등록 처리 
 		- service 단에서 호출 처리 
+# 상세화면 처리 
+1. 리스트 화면에서 특정한 row 클릭, no와 함께 
+	controller 상세화면 처리 
+2. sql 작성 
+	select * from board where no = #{no}
+3. dao 작성 
+4. XXXmapper.xml 
+5. service 호출 
+6. controller 
+	model 처리 
+	상세 화면 호출 
+7. 상세화면에 출력 리스트 	
 		
+# 첨부파일 리스트 및 다운로드 
+1. sql 작성 select * from boardfile where no = #{no}
+2. vo확인 
+3. dao public ArrayList<BoardFile> getBoardFile(int no); 
+4. mapper처리 
+5. Board VO 객체에 첨부파일을 처리할 수 있는 추가 등록 
+	private ArrayList<BoardFile> fileInfo; 
+6. service에서 Board VO에 할당 
+7. jsp에서 처리 
+
+# 조회수 count up 처리 
+1. sql 
+	update board
+		set readcnt = readcnt+1
+		where no =#{no}
+2. dao public void updateBaord(int no);
+3. mapper
+4. service단에서 호출 
+	dao.updateBoard(no); 
 		
+# 파일 다운로드 
+1. 리스트 처리 
+	board의 FileInfo로 리스트 처리 
+2. 파일다운로드작성 및 container에 view 등록 
+3. 파일명을 모델로 파일다운로드 controller 생성 
+	- 요청값으로 파일명을 전송 
+	- model값 파일을 설정 => downloadFile 로 설정해야 지정된 
+		파일명을 viewer에서 인식 
+	- return 으로 컨테이너에서 선언한 bean id 를 호출 
+		downloadviewer 
+	
+	
+4. 상세화면 리스트에서 함수로 파일 다운 호출 
+	다운로드 controller 호출 
+5. 해당 파일 클릭 시, 다운로드 처리 
+
+# 파일 다운로드 viewer 작성 
+1. api에서 지원되는 부분에서 model데이터로 특정한 파일을 지정해야 하기 때문에 
+	사용자 정의로 만들어야 한다. 
+	
+2. 사용자정의 viewer 작성 순서 
+	- 1. 상속 AbstractView 선언 
+		1) overriding 메서드 재정의 
+			- renderMergeOutputModel
+				매개변수 
+				Map<String,Object> model : 다운로드할 파일명을 할당 처리 
+				HttpServletRequest request,
+				HttpServletResponse response 
+	- 2. 다운로드 처리 
+		1) upload된 파일 가져오기 (서버가 가지고 있는 파일) 
+			- 현재 viewer를 호출 시, 사용되는 model 객체 가져오기 
+			- File 객체 생성 
+		2) 모델과 함께 있는 File객체 가져오기(서버가 가지고 있는 파일) 
+		3) 반응 객체(response)로 전달 처리(클라이언트에 파일) 
+			- 전체 파일명 
+			- 파일명 
+			- 파일의 길이 
+			- setContentType 설정 : application/download;charset-utf-8
+			- setContentLength로 파일의 길이 설정 
+			- 한글명된 파일은 Encoding처리 
+			- 파일을 response에 탑재를 위한 header부분 설정 
+				Content-Disposition 으로 attachment 로 파일 설정 
+				Content-Transfer-Encoding설정 binary 설정 
+			- 파일을 network로 전송하기 위해 Stream객체로 변환 
+				InputStream(읽어오는객체) ==> OutputStream 보내는 객체 
+				FileInputStream(파일객체) 
+				FileCopyUtils.copy(inputstream,outputstream)
+				outputstream의 flush를 통해서 자원 해제 
+				
+
+
+
+
+
+
+
+
+
+
+
 ex) 연습예제 
 1. 화면 및 DB구조 
 	-- content, fname

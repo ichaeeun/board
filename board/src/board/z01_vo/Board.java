@@ -1,5 +1,6 @@
 package board.z01_vo;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +23,7 @@ public class Board {
 	private Date uptdte;
 	private String content;
 	private MultipartFile[] report;
+	private ArrayList<BoardFile> fileInfo; 
 	public Board() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -103,6 +105,14 @@ public class Board {
 
 	public void setReport(MultipartFile[] report) {
 		this.report = report;
+	}
+
+	public ArrayList<BoardFile> getFileInfo() {
+		return fileInfo;
+	}
+
+	public void setFileInfo(ArrayList<BoardFile> fileInfo) {
+		this.fileInfo = fileInfo;
 	}
 	
 	

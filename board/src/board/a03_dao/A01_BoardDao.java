@@ -14,4 +14,13 @@ public interface A01_BoardDao {
 	public void insertBoard(Board insert);
 	
 	public void uploadFile(BoardFile ins);
+	
+	// 상세화면 
+	public Board getBoard(int no);
+	
+	// 첨부파일 불러오기 
+	public ArrayList<BoardFile> getBoardFile(int no);
+	
+	// 조회수 증가 
+	public void uptReadCnt(int no);
 }

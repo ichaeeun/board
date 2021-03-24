@@ -1,5 +1,6 @@
 package board.z01_vo;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 public class BoardFile {
@@ -13,6 +14,8 @@ public class BoardFile {
 	private String pathname;
 	private String content;
 	private Date credte;
+	
+	
 	public BoardFile() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -65,7 +68,6 @@ public class BoardFile {
 	public void setCredte(Date credte) {
 		this.credte = credte;
 	}
-	
-	
+
 	
 }

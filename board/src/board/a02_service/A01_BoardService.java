@@ -20,7 +20,7 @@ public class A01_BoardService {
 	@Autowired(required=false)
 	private A01_BoardDao dao;
 	
-	//  info 에 있는 설정 값이 들어온다. ${upload} ${uploadTmp} 
+//  info 에 있는 설정 값이 들어온다. ${upload} ${uploadTmp} 
 	@Value("${upload}")
 	private String upload; 
 	@Value("${uploadTmp}")
@@ -38,12 +38,22 @@ public class A01_BoardService {
 		System.out.println("upload: "+upload);
 		System.out.println("uploadTmp: "+uploadTmp);
 		// 2. 데이터베이스 처리 
-		dao.insertBoard(insert);
+		dao.insertBoard(insert); // 메인 board테이블에 정보 등록 
 		
 		// 1. 물리적 파일 업로드 
 		String fname = null;
 		File tmpFile = null; // 임시위치 
 		File orgFile = null; // 업로드 위치 
+		
+		File pathFile = new File(uploadTmp); //폴더 객체 생성 
+		//.listFiles() : 해당 폴더 객체 안에 있는 파일을 가져오기 
+		// 임시폴더에 있는 모든 파일을 삭제함으로써 중복예외를 방지한다. 
+		for(File f:pathFile.listFiles()) {
+			System.out.println("삭제할파일: "+f.getName());
+			// 단위파일을 삭제처리 
+			f.delete();
+		}
+		
 		// # 다중 파일 처리 / 반복문 수행 
 		for(MultipartFile mpf:insert.getReport()) {
 			// 1) 파일명 지정 
@@ -51,7 +61,8 @@ public class A01_BoardService {
 			// 파일을 등록하지 않았을 때 제외 처리 
 			if(fname!=null && !fname.trim().equals("")) {
 				// 임시파일 객체 선언(경로 + 파일명)  
-				tmpFile = new File(uploadTmp+fname);
+				// ps) File 객체는 파일과 폴더를 처리할 수 있다. 
+				tmpFile = new File(uploadTmp+fname); 
 				// MultipartFile ==> File로 변환처리 
 				try {
 					mpf.transferTo(tmpFile); 
@@ -59,6 +70,8 @@ public class A01_BoardService {
 					// 해당 위치에 파일이 생성됨 
 					// 임시위치에서 다운로드할 폴더로 (z01_upload로) 복사 처리 
 					orgFile = new File(upload+fname);
+						
+					
 					// 복사처리 
 					// StandardCopyOption.REPLACE_EXISTING : 동일한 파일명 업로드 시 대체 처리 
 					Files.copy(tmpFile.toPath(), orgFile.toPath(),StandardCopyOption.REPLACE_EXISTING);
@@ -67,6 +80,7 @@ public class A01_BoardService {
 					
 				} catch (IllegalStateException e) {
 					// TODO Auto-generated catch block
+					System.out.println("상태값 에러: "+e.getMessage());
 					e.printStackTrace();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
@@ -77,9 +91,15 @@ public class A01_BoardService {
 				}
 			}
 		}
-	
-		
-		
 	}
-	
+	public Board getBoard(int no) {
+		// 1.조회 cnt 수정 (readcnt) 
+		dao.uptReadCnt(no);
+		// 2. 기본 board 정보할당 
+		Board board = dao.getBoard(no);
+		// 3. 첨부파일 정보 할당 
+		board.setFileInfo(dao.getBoardFile(no));
+		
+		return board;
+	}
 }

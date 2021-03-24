@@ -36,15 +36,20 @@
       }
       
       $("#addFun").click(function(){
+    	  // .clone()을 해서 복사해서 DOM객체가 추가하여 생성할 수 있게 한다. 
     	  $("#fileArea").append($(".custom-file").eq(0).clone());
       });
 
    });
    
    function rm(obj){
+	   // 삭제 전에 validate check(유효성체크) file객체가 한개 초과하여 
+	   // 있을 때 가능하도록 설정 
 	   var len = $("[type=file]").length;
 	   if(len>1){	// 화면 ui를 위해 한개는 남겨둔다. 
-		   $(obj).parent().remove(); // parent : div class="custom-file" 
+		   $(obj).parent().remove(); 
+	   // $(obj).parent() : div class="custom-file"  삭제 
+	   // 상위 custom-file 삭제 시 하위에 현재 File객체도 함께 삭제된다. 
 	   }
    }
 </script>
@@ -78,6 +83,11 @@
          	<span id="addFun" class="badge badge-inf">[추가]</span></th>
          <td id="fileArea">
             <div class="custom-file">
+            	<%--
+            	rm(this) : rm함수를 호출하면서 클릭한 span객체를 
+            	함수의 매개변수로 object로 전송 
+            	계층 구조로 상위 DOM <div class="custom-file">을 가지고 있다. 
+            	 --%>
                <span onclick="rm(this)" class="badge badge-danger"> [X] </span>&nbsp;
                <input name="report" type="file"/><br>
             </div>
