@@ -4,18 +4,34 @@
    "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 
 <mapper namespace="board.a03_dao.A01_BoardDao">
+
+	<!-- public int totCnt(BoardSch sch); 
+		 -->
+	<select id="totCnt" resultType="int" parameterType="boardsch">
+			select count(*) from board 
+			where subject like '%'||#{subject}||'%' 
+			and writer LIKE '%'||#{writer}||'%' 
+	</select>
+
 	<resultMap type="board" id="boardMap"></resultMap>
 	<!-- public ArrayList<Board> boardList(Board sch); -->
-	<select id="boardList" resultMap="boardMap" parameterType="board">
-		select * from board 
-		where subject like '%'||#{subject}||'%' 
-		and writer LIKE '%'||#{writer}||'%' 
-		order by no DESC
+	<select id="boardList" resultMap="boardMap" parameterType="boardsch">
+		select * 
+		from (
+			select rownum rn, level, a.* 
+			from board a
+			where subject like '%'||#{subject}||'%' 
+			and writer LIKE '%'||#{writer}||'%' 
+			start with refno =0
+			connect by prior no =refno 
+			order siblings by no desc
+		)
+		where rn between #{start} and #{end} 
 	</select>
 
 	<!-- public void insertBoard(Board insert); -->
 	<insert id="insertBoard" parameterType="board">
-		INSERT INTO board values(board_seq.nextval,0,#{subject},#{content},#{writer},0,sysdate,sysdate)
+		INSERT INTO board values(board_seq.nextval,#{refno},#{subject},#{content},#{writer},0,sysdate,sysdate)
 	</insert>
 	
 	<!-- public void uploadFile(BoardFile ins); -->
@@ -45,7 +61,35 @@
 		update board set readcnt = readcnt+1 
 		where no = #{no}
 	</update>
+	
+	
+	<!-- public void updateBoard(Board upt);  -->
+	<update id="updateBoard" parameterType="board">
+		update board 
+		set subject = #{subject},
+			content = #{content},
+			uptdte = sysdate
+		where no = #{no}
+	</update>
+	
+	<!-- public void updateFile(HashMap<String,String> hs);  -->
+	<update id="updateFile" parameterType="hashmap">
+		update boardfile 
+			set fname = #{fname} 
+		where no = #{no} 
+		and fname = #{orgFname}
+	</update>
+	
+	<!-- public void deleteBoard(int no); 
+		 public void deleteFile(int no); -->
+	<delete id="deleteBoard" parameterType="int">
+		delete from board where no = #{no}
+	</delete>
+	<delete id="deleteFile" parameterType="int">
+		delete from boardfile where no = #{no}
+	</delete>
 </mapper>
+
 
 
 

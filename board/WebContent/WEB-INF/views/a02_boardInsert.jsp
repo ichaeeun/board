@@ -28,13 +28,25 @@
          location.href="${path}/board.do?method=list";
       });
 
-  	 var isInsert = "${param.subject}";
-     if (isInsert != "") {
+  //	 var isInsert = "${param.subject}";
+   /*   if (isInsert != "") {
          if (confirm("등록완료!!\n조회화면으로 이동하시겠습니까?")) {
             location.href = "${path}/board.do?method=list";
          }
       }
-      
+       */
+       
+       var proc = "${proc}";
+       // alert(proc);
+       if(proc=="insert"){
+    	   // 답글 처리 후, 모델 값을 없에는 처리 
+    	   $("[name=refno]").val("0");
+    	   $("[name=subject]").val("");
+    	   $("[name=content]").val("");
+    	   if(!confirm("등록완료!!\n계속 등록하시겠습니까?")){
+    		   location.href="${path}/board.do?method=list";
+    	   }
+       }
       $("#addFun").click(function(){
     	  // .clone()을 해서 복사해서 DOM객체가 추가하여 생성할 수 있게 한다. 
     	  $("#fileArea").append($(".custom-file").eq(0).clone());
@@ -58,15 +70,16 @@
    <h2>게시판 등록</h2>
 </div>
 <div class="container">
-   <form action="${path}/board.do?method=insert" method="post"
+   <form:form modelAttribute="board" action="${path}/board.do?method=insert" method="post"
    	enctype="multipart/form-data">
-   <input type="hidden" name="refno" value="0"/>
+   	<form:hidden path="refno"/>
    <table class="table table-hover table-striped">
    <col width="30%">
    <tbody>      <%--상위글번호(0,hidden), 글제목, 작성자, 내용, 첨부파일--%>
       <tr class="text-center">
          <th class="table-success">제목</th>
-         <td><input type="text" name="subject" class="form-control"/></td>
+         <td>
+         <form:input path="subject" class="form-control"/>
       </tr>
       <tr class="text-center">
          <th class="table-success">작성자</th>
@@ -75,8 +88,8 @@
       <tr class="text-center">
          <th class="table-success">내용</th>
          <td>
-            <textarea name="content" rows="10" cols="" 
-               class="form-control"></textarea></td>
+         	<form:textarea path="content" rows="10" class="form-control"/>
+         </td>
       </tr>
       <tr class="text-center">
          <th class="table-success">첨부파일
@@ -101,7 +114,7 @@
       </tr>
    </tbody>
    </table>  
-   </form>  
+   </form:form>  
 </div>
 </body>
 </html>

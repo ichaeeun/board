@@ -24,12 +24,77 @@
 --%>
 //
    $(document).ready(function(){
+	   var memId = "${mem.id}";
+	   
+	   $("#uptBtn").click(function(){
+		   var writer = $("[name=writer]").val();
+	  //   alert(memId+":"+writer);
+	  	   if(writer==memId){
+	  		   if(confirm("수정하시겠습니까?")){
+	  			   $("[name=proc]").val("upt");
+	  			   $("form").attr("action","${path}/board.do?method=update");
+	  			   $("form").submit();
+	  			   
+	  		   }
+	  	   }else{
+	  		   alert("수정권한이 없습니다.");
+	  	   }
+	   });
+	   
+	   var proc = "${param.proc}";
+	   if(proc=="upt"){
+		   if(confirm("수정완료\n메인화면으로 이동하시겠습니까?")){
+			   location.href="${path}/board.do?method=list";
+		   }
+	   }
+	   $(".custom-file-input").on("change",function(){
+		   $(this).next(".custom-file-label").text($(this).val());
+	   });
+	   
+	   $("#delBtn").click(function(){
+		   var writer = $("[name=writer]").val();
+	  //   alert(memId+":"+writer);
+	  	   if(writer==memId){
+	  		   if(confirm("삭제하시겠습니까?")){
+	  			 $("[name=proc]").val("del");
+	  			   $("form").attr("action","${path}/board.do?method=delete");
+	  			   $("form").submit();
+	  		   }
+	  	   }else{
+	  		   alert("삭제권한이 없습니다.");
+	  	   }
+	   });
+	   if(proc=="del"){
+		   if(confirm("삭제되었습니다")){
+			   location.href="${path}/board.do?method=list";
+		   }
+	   }
+	   
+	   $("#goMain").click(function(){
+		   location.href="${path}/board.do?method=list";
+	   })
+	   
+	   
       	$("[name=fnames]").click(function(){
       		var fname=$(this).val();
       		if(confirm(fname+"파일을 다운로드 하시겠습니까?")){
       			location.href="${path}/board.do?method=download&fname="+fname;
       		}
       	});
+	   
+	   $("#reBtn").click(function(){
+		   if(confirm("답글달기!")){
+			   // 답글 처리를 위한 데이터 처리 
+			   $("[name=refno]").val($("[name=no]").val());
+			   $("[name=subject]").val("\t RE: "+$("[name=subject]").val());
+			   $("[name=content]").val("\n\n\n\n\n\n\n======이전 글=======\n"+$("[name=content]").val());
+			   
+			   
+			   
+			   $("form").attr("action","${path}/board.do?method=insForm");
+			   $("form").submit();
+		   }
+	   })
    });
 </script>
 <style>
@@ -49,17 +114,18 @@
 </div>
 <div class="container">
      <form method="post" enctype="multipart/form-data">
+     <input type="hidden" name="proc"/>
      <div class="input-group mb-3">
      	<div class="input-group-prepend">
      		<span class="input-group-text">글번호</span>
      	</div>
      	  <input class="form-control" 
-          name="refno" value="${board.no }">
+          name="no" value="${boarddetail.no }" readonly>
      	<div class="input-group-prepend">
      		<span class="input-group-text">상위글번호</span>
      	</div>
      	<input class="form-control" type="text" 
-          name="refno" value="${board.refno }">
+          name="refno" value="${boarddetail.refno }" readonly >
      </div>
        
           
@@ -68,12 +134,12 @@
      		<span class="input-group-text">작성자</span>
      	</div>
      	   <input class="form-control" type="text" 
-          name="writer" value="${board.writer }">
+          name="writer" value="${boarddetail.writer }" readonly>
      	<div class="input-group-prepend">
      		<span class="input-group-text">조회수</span>
      	</div>
      	 <input class="form-control" type="text" 
-          name="readcnt" value="${board.readcnt }">
+          name="readcnt" value="${boarddetail.readcnt }" readonly>
      </div>
       
     
@@ -82,7 +148,7 @@
      		<span class="input-group-text">제목</span>
      	</div>
      	 <input class="form-control" type="text" 
-          name="subject" value="${board.subject }">             
+          name="subject" value="${boarddetail.subject }">             
      </div>
       
      <div class="input-group mb-3">
@@ -90,12 +156,14 @@
      		<span class="input-group-text">등록일</span>
      	</div>
      	<input class="form-control" type="text" 
-          name="regdte" value="<fmt:formatDate value="${board.regdte }"/>">
+          value="<fmt:formatDate type="date" value="${boarddetail.regdte }" pattern="yyyy/MM/dd" />" readonly>
+    <%--      value="<fmt:formatDate type='both' value="${board.regdte }"/>" readonly> --%>
      	<div class="input-group-prepend">
      		<span class="input-group-text">수정일</span>
      	</div>
      	  <input class="form-control" type="text" 
-          name="uptdte" value="<fmt:formatDate value="${board.uptdte }"/>">  
+         value="<fmt:formatDate value="${boarddetail.uptdte }" type="date" pattern="yyyy/MM/dd"/>" readonly>  
+     <%--       value="<fmt:formatDate type='both' value="${board.uptdte }"/>" readonly> --%>
      </div>
      
           
@@ -105,11 +173,11 @@
      		<span class="input-group-text">내용</span>
      	</div>
      	 <textarea class="form-control" rows=10
-          name="content">${board.content }</textarea>
+          name="content">${boarddetail.content }</textarea>
      </div>
       
-     <c:set var="fcnt" value="${board.fileInfo.size() }"/>
-     <c:forEach var="finf" items="${board.fileInfo}" varStatus="sts">
+     <c:set var="fcnt" value="${boarddetail.fileInfo.size() }"/>
+     <c:forEach var="finf" items="${boarddetail.fileInfo}" varStatus="sts">
      <div class="input-group mb-3">
      	<div class="input-group-prepend">
      		<span class="input-group-text">첨부파일(${sts.count}/${fcnt})</span>

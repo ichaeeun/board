@@ -1,8 +1,10 @@
 package board.z01_vo;
 
 import java.util.ArrayList;
+
 import java.util.Date;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
 public class Board {
@@ -14,16 +16,20 @@ public class Board {
 //	regdte DATE,
 //	uptdte DATE,
 //	content varchar2(1000)	
+	private int level; 
 	private int no;
 	private int refno;
 	private String subject;
 	private String writer;
 	private int readcnt;
 	private Date regdte;
+	private String regdteS;
 	private Date uptdte;
+	private String uptdteS;
 	private String content;
-	private MultipartFile[] report;
-	private ArrayList<BoardFile> fileInfo; 
+	private MultipartFile[] report;		// 업로드 시 필요 
+	private String[] fnames; // 파일 수정 시 필요 
+	private ArrayList<BoardFile> fileInfo; 	// 다운로드 시 필요 
 	public Board() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -75,6 +81,9 @@ public class Board {
 	public Date getRegdte() {
 		return regdte;
 	}
+	
+	// 문자열로 요청한 값을 Date객체로 처리할 때 활용된다. 
+// 	@DateTimeFormat(pattern="yyyy/MM/dd")
 	public void setRegdte(Date regdte) {
 		this.regdte = regdte;
 	}
@@ -113,6 +122,38 @@ public class Board {
 
 	public void setFileInfo(ArrayList<BoardFile> fileInfo) {
 		this.fileInfo = fileInfo;
+	}
+
+	public String getRegdteS() {
+		return regdteS;
+	}
+
+	public void setRegdteS(String regdteS) {
+		this.regdteS = regdteS;
+	}
+
+	public String getUptdteS() {
+		return uptdteS;
+	}
+
+	public void setUptdteS(String uptdteS) {
+		this.uptdteS = uptdteS;
+	}
+
+	public String[] getFnames() {
+		return fnames;
+	}
+
+	public void setFnames(String[] fnames) {
+		this.fnames = fnames;
+	}
+
+	public int getLevel() {
+		return level;
+	}
+
+	public void setLevel(int level) {
+		this.level = level;
 	}
 	
 	
