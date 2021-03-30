@@ -44,11 +44,11 @@
    });
    function goPage(page){
 	   // 1. 이전페이지 0 ==>1  
-	   if(page==0) page=1; 
-	   var pageCount = "${sch.pageCount}";
+	   // if(page==0) page=1; 
+	   // var pageCount = "${sch.pageCount}";
 	   // 2. 이후페이지 pageCount+1 ==> pageCount 
-	   if(page>pageCount) page=pageCount;
-	   
+	   // if(page>pageCount) page=pageCount;
+	   // => service단에서 처리 
 	   $("[name=curPage]").val(page);
 	   $("form").submit();
    }
@@ -130,11 +130,17 @@
   </table>    
   <ul class="pagination justify-content-center" style="margin:20px 0;">
   <li class="page-item">
+  <!--  이전(previous) 클릭시 기본적으로 현재블럭의 시작번호 -1로 처리되게 한다.  -->
   	<a class="page-link" href="javascript:goPage(${sch.startBlock-1 })">Previous</a></li>
+  	<!-- 블럭은 시작블럭과 마지막 블럭번호를 반복문으로 수행하게 한다.  -->
   <c:forEach var="cnt" begin="${sch.startBlock }" end="${sch.endBlock }">
-  		<li class="page-item ${sch.curPage==cnt?'active':'' }"><a class="page-link" href="javascript:goPage(${cnt })">${cnt }</a></li>
+  <!-- 클릭한 현재 페이지번호와 반복되는 페이지 번호가 같으면 active 클래스 적용  -->
+  		<li class="page-item ${sch.curPage==cnt?'active':'' }">
+  			<a class="page-link" href="javascript:goPage(${cnt })">${cnt }</a>
+  		</li>
   </c:forEach>
   <li class="page-item">
+  <!--  다음(next) 클릭 시 현재블럭의 마지막번호 +1로 처리되게 한다.  -->
   	<a class="page-link" href="javascript:goPage(${sch.endBlock+1 })">Next</a></li>
   </ul>
 </div>

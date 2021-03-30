@@ -45,6 +45,10 @@ public class A01_BoardService {
 		if(sch.getCurPage()==0) {
 			sch.setCurPage(1);
 		}
+		// 마지막 페이지 블럭에서 next클릭했을 때의 예외처리 
+		if(sch.getCurPage()>sch.getPageCount()) {
+			sch.setCurPage(sch.getPageCount());
+		}
 		// start, end 속성을 도출하기 위하여 
 		sch.setEnd(sch.getCurPage()*sch.getPageSize());
 		sch.setStart((sch.getCurPage()-1)*sch.getPageSize()+1);
@@ -59,6 +63,7 @@ public class A01_BoardService {
 		// 마지막 페이지블럭에서는 endblock을 마지막페이지수로 설정 
 		sch.setEndBlock(endBlock>sch.getPageCount()?sch.getPageCount():endBlock);
 		// 4. startBlock
+		// 	이전 블럭의 마지막 페이지 번호 +1 이 현재 블럭의 첫번째 페이지번호 
 		sch.setStartBlock((blocknum-1)*sch.getBlockSize() +1);
 		
 		return dao.boardList(sch);

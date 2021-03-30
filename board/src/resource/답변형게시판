@@ -539,9 +539,10 @@
 
 		endBlock 블럭마다 마지막 페이지번호 
 			blocknum*blockSize 
-			마지막 블럭의 페이지번호는 pageCount까지 이다. 
+			마지막 블럭의 페이지번호는 pageCount(총페이지수)까지 이다. 
 		startBlock  블럭마다 시작 페이지번호 
 			(blocknum-1)*blockSize+1 
+			이전블럭의 마지막번호 + 1 
 					
 	4) 개발 순서 
 		- vo 속성값 지정 
