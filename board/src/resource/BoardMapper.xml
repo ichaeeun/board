@@ -11,14 +11,20 @@
 			select count(*) from board 
 			where subject like '%'||#{subject}||'%' 
 			and writer LIKE '%'||#{writer}||'%' 
+			start with refno = 0 
+			connect by prior no = refno 
 	</select>
 
 	<resultMap type="board" id="boardMap"></resultMap>
 	<!-- public ArrayList<Board> boardList(Board sch); -->
+	<!--  select rownum rn 
+			==> select rownum cnt 로 바꿈 
+				+ VO 객체에 private int cnt 추가 
+			 -->
 	<select id="boardList" resultMap="boardMap" parameterType="boardsch">
 		select * 
 		from (
-			select rownum rn, level, a.* 
+			select rownum cnt, level, a.* 
 			from board a
 			where subject like '%'||#{subject}||'%' 
 			and writer LIKE '%'||#{writer}||'%' 
@@ -26,7 +32,7 @@
 			connect by prior no =refno 
 			order siblings by no desc
 		)
-		where rn between #{start} and #{end} 
+		where cnt between #{start} and #{end} 
 	</select>
 
 	<!-- public void insertBoard(Board insert); -->
@@ -82,8 +88,14 @@
 	
 	<!-- public void deleteBoard(int no); 
 		 public void deleteFile(int no); -->
+	<!-- 상위글 삭제되면 하위글이 다 삭제되도록.  -->
 	<delete id="deleteBoard" parameterType="int">
-		delete from board where no = #{no}
+		delete from board where no in(
+			select no 
+			from board a
+			start with no =#{no}
+			connect by prior no = refno
+		)
 	</delete>
 	<delete id="deleteFile" parameterType="int">
 		delete from boardfile where no = #{no}

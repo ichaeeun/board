@@ -56,16 +56,18 @@
 	6) 계층형 리스트 처리하기 
 		- 계층형 sql 작성 
 		- 조회 vo 할당(BoardSch 추가) 
-			전체글수
-			페이지당 보일 데이터 건수 
-			페이지수 
-			시작번호 
-			마지막 번호 
+			전체글수 [DB] 
+			페이지당 보일 데이터 건수[화면-요청] 
+			페이지수 [service단 로직] 
+			현재페이지[화면-요청] 
+			시작 번호 [service단 로직]
+			마지막 번호 [service단 로직]
 		- service 단에서 business 로직 처리 
+			
 		- 계층적 리스트 및 페이징 처리 
 			페이지당 데이터 건수 select[3/5/10/20]
 			클릭한 현재 페이지 번호 [1][2][3][4][5]
-			페이지블럭 처리 
+			페이지블럭 처리 		<<		>> 
 		
 # DB 설계 및 VO 만들기 
 	1) DB 설게 및 테이블 구성 
@@ -115,12 +117,15 @@
 	9) 화면 등록 완료 처리 메시지 출력 
 
 # 파일 업로드 처리 
-1. 다중 파일 업로드를 위한 화면 UI 구성(view) 
+1. container(dispatcher-servlet.xml)에 파일 업로드 
+	view bean 추가 처리 
+	org.springframework.web.multipart.commons.CommonsMultipartResolver
+	
+2. 다중 파일 업로드를 위한 화면 UI 구성(view) 
 	<input type="file" name="report"/> 
-2. form 객체의 속성 추가 처리 
+3. form 객체의 속성 추가 처리 
 	<form enctype="multipart/form-data" method="post" 
-3. container에 파일 업로드 view bean 추가 처리 
-	org.springframework.web.multipart.commons.CommonsMultipartResolver 
+ 
 4. VO에서 report라는 프로퍼티로 네트워크상(client ==> server) 전송 가능하게 해주는 
 	MultipartFile 객체를 속성 선언 
 	private MultipartFile[] report; 
@@ -133,13 +138,30 @@
 		- 파일 다운로드할 폴더(upload): 임시 폴더에 있는 파일 추후 다운로드할 폴더에 복사 처리 
 							- info에 위치 설정. 절대위치 지정.  /Users/ichaeeun/git/board/board/WebContent/z01_upload
 		- 다운로드 업로드 폴더 위치 지정
-		- 임시폴더에 있는 모든 파일 삭제 (예외방지) 
+		- 임시폴더에 있는 모든 파일 삭제 (예외방지 - 동일파일 저장) 
 		- MultipartFile 객체(메모리로 파일정보) 
 			==> File 변환(메모리+하드웨어적으로 특정 위치에 파일을 저장) 
 			transferTo() 메서드 사용 
 		- 임시파일 ==> 업로드할 위치로 복사 
 			파일카피 정책으로는 기존파일이 있으면 덮어쓰기 처리 .. 
-			
+		ex) 현업 처리 프로세스 
+		1. WAS 서버 따로 구축 
+		2. file 서버 따로 구축 
+			임시폴더가 필요 없음, 바로 파일 서버로 저장 
+			동일명의 파일에 대한 처리 
+				ex) 게시판 no 1번에 첨부파일로 a.txt 저장, 
+					게시판 no 2번에 다른 내용의 첨부파일 a.txt를 저장 
+					파일 첨부 시 저장되는 파일명 컬럼지정 중복되지 않게 
+					hash코드+sequence
+					 ex) abse10001(파일서버에 저장할 파일명 - 중복불가)  
+					 	 실제파일명 따로 컬럼을 지정해서 저장 
+					 	 번호 	저장명			파일명
+					 	 1		abse10001 		a.txt 
+					 	 2		abse10002 		a.txt 
+					 	 
+						 다운로드 시, DB에 저장된 파일명으로 전환하여 다운로드할 수 있게 
+						 처리한다. 
+						 
 	2) DB에 해당 파일 정보를 저장 처리 
 		(상세화면에서 다운로드 처리를 위해 파일 정보 저장) 
 		- db 구조 만들기 
@@ -190,14 +212,13 @@
 # 파일 다운로드 
 1. 리스트 처리 
 	board의 FileInfo로 리스트 처리 
-2. 파일다운로드작성 및 container에 view 등록 
+2. 파일다운로드 viewer 작성 및 container에 view 등록 
 3. 파일명을 모델로 파일다운로드 controller 생성 
 	- 요청값으로 파일명을 전송 
 	- model값 파일을 설정 => downloadFile 로 설정해야 지정된 
 		파일명을 viewer에서 인식 
 	- return 으로 컨테이너에서 선언한 bean id 를 호출 
 		downloadviewer 
-	
 	
 4. 상세화면 리스트에서 함수로 파일 다운 호출 
 	다운로드 controller 호출 
@@ -439,7 +460,7 @@
 	4) 페이지 처리를 위한 속성들 
 		시작번호 : start 
 		마지막번호 : end 
-	5) 위 속성을 가져오기 위한 속성 
+	5) 위 속성을 가져오기 위한 속성(service 단) 
 		총 데이터 건수(db sql) : count select count(*) from board where 
 		한번에 보여줄 페이지(화면에서 요청값-select) : pageSize 
 		총 페이지수 : pageCount : 총데이터건수 100 한번에 보여줄 글 10 
@@ -492,7 +513,46 @@
 		요청값 전달 
 
 7. 블럭페이지 처리 
-	
+	1) 페이지수가 커질 때, 한정된 페이지(5,7,9) 번호를 보이고, 
+		해당 범위 이상으로 가면 <<(이전), >>(이후)로 block단위로 
+		페이지를 보이게 하여, 효과적으로 페이징 처리를 하는 것을 말한다. 
+	2) 핵심 로직 
+		 	1  2  3  4  5  >>[이후]  ==> blocknum 1 
+	<<[이전]	6  7  8  9  10 >>[이후]  ==> blocknum 2 
+	<<[이전]	11 12 13 			    ==> blocknum 3 
+		 이전/이후 클릭 시 블럭단위로 	이동 처리하여 페이지번호를 하단에 
+		 리스트 처리 한다. 
+		 
+	3) 주요 속성 
+		blocksize: 블럭단위로 보일 페이지 크기(5개 페이지) 
+		blocknum : 블럭단위에 할당할 블럭번호 
+		  (blockSize와 curPage를 이용해서 처리) 
+		    curPage/blockSize 
+		    	1/5, 2/5, 3/5, 4/5, 5/5 =(올림처리)=> 1 
+		    	6/5, 7/5, 8/5, 9/5, 10/5 =(올림처리)=> 2 
+		    	
+			ex) 1번 블럭에는 1페이지 ~ 5페이지까지 출력 
+				2번 블럭에는 6페이지 ~ 10페이지까지 출력 
+				3번 블럭에는 11페이지 ~ 페이지의 마지막 번호(pageCount) 
+				페이지 번호를 3번 블럭의 연산 상으로 15가 마지막 번호 이지만 
+				페이지크기(13페이지)보다 더 클 수 없다. 
+
+		endBlock 블럭마다 마지막 페이지번호 
+			blocknum*blockSize 
+			마지막 블럭의 페이지번호는 pageCount까지 이다. 
+		startBlock  블럭마다 시작 페이지번호 
+			(blocknum-1)*blockSize+1 
+					
+	4) 개발 순서 
+		- vo 속성값 지정 
+		- service 단에서 위의 로직 처리 
+		- 화면단 구현 
+			<c:forEach begin="${boardsch.startBlock}" end="${boardsch.endBlock}" 
+			이전/이후를 클릭 시, 전송할 현재페이지 -1, +1 curpage설정 
+			
+			
+				
+		
 
 	
 	

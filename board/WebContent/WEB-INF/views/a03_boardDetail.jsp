@@ -74,7 +74,7 @@
 		   location.href="${path}/board.do?method=list";
 	   })
 	   
-	   
+	   // 파일 다운로드 처리 
       	$("[name=fnames]").click(function(){
       		var fname=$(this).val();
       		if(confirm(fname+"파일을 다운로드 하시겠습니까?")){
@@ -182,10 +182,10 @@
      	<div class="input-group-prepend">
      		<span class="input-group-text">첨부파일(${sts.count}/${fcnt})</span>
      	</div>
-     	<!-- 다운로드할 파일 정보 -->
+     	<!-- 다운로드할 파일 정보(기존 파일) -->
      	<input class="form-control fileInfo" name="fnames" value="${finf.fname }"/>
      	 <div class="custom-file">
-     		<!-- 변경할  파일정보(report ==> vo 의 property) -->
+     		<!-- 변경할  파일정보(report ==> vo 의 property)(수정하여 업로드할 파일) -->
 	     	<input type="file" name="report" class="custom-file-input" id="file01"/>
 	     	<label class="custom-file-label" for="file01">
 	     	변경하려면 파일을 선택하세요!</label>

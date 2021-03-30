@@ -13,6 +13,9 @@
 <title>Insert title here</title>
 <link rel="stylesheet" href="${path}/a00_com/bootstrap.min.css" >
 <link rel="stylesheet" href="${path}/a00_com/jquery-ui.css" >
+<style>
+	.sch{width:25%;}
+</style>
 <script src="${path}/a00_com/jquery.min.js"></script>
 <script src="${path}/a00_com/popper.min.js"></script>
 <script src="${path}/a00_com/bootstrap.min.js"></script>
@@ -39,11 +42,15 @@
 		   $("form").submit();
 	   });
    });
-   
    function goPage(page){
+	   // 1. 이전페이지 0 ==>1  
+	   if(page==0) page=1; 
+	   var pageCount = "${sch.pageCount}";
+	   // 2. 이후페이지 pageCount+1 ==> pageCount 
+	   if(page>pageCount) page=pageCount;
+	   
 	   $("[name=curPage]").val(page);
 	   $("form").submit();
-	   
    }
 </script>
 </head>
@@ -56,10 +63,11 @@
  <form:hidden path="curPage"/>
   <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
      
-       <form:input class="form-control mr-sm-2" type="text" 
+      <%--.sch{width:25%;} 추가 --%>
+       <form:input class="form-control mr-sm-2 sch" type="text" 
           path="subject"
           placeholder="제목"/>
-       <form:input class="form-control mr-sm-2" type="text" 
+       <form:input class="form-control mr-sm-2 sch" type="text" 
           path="writer" 
           placeholder="작성자"/>
        <button class="btn btn-success" type="submit">Search</button>&nbsp;
@@ -68,16 +76,12 @@
   <%-- 총건수와 페이지크기  --%>
   <div class="input-group lb-3">
   	 <div class="input-group-prepend">
-  	 	<span class="input-group-text">총 : ${sch.count }건</span>
+  	 	<span class="btn btn-info">총 : ${sch.count }건</span>
   	 </div>
   	 <input class="form-control" />
   	 <div class="input-group-append">
-  	 	<span class="input-group-text">페이지 크기:</span>
-  	 	<form:select path="pageSize" class="form-control">
-  	 		<form:option value="3">3</form:option>
-  	 		<form:option value="5">5</form:option>
-  	 		<form:option value="10">10</form:option>
-  	 		<form:option value="30">30</form:option>
+  	 	<span class="btn btn-info">페이지 크기:</span>
+  	 	<form:select path="pageSize" items="${pageOp}" class="form-control">
   	 	</form:select>
   	 </div>
   </div>
@@ -107,7 +111,8 @@
     		var="crFmt" integerOnly="true"/> --%>
     		
       <tr class="text-center data" id="${b.no }">
-        <td>${b.no }</td>
+      <%--id는 no를 그대로 보내고 화면출력은 cnt로 함 --%>
+        <td>${b.cnt }</td>
         <td class="text-left">
         <!-- 답글의 level만큼 공백을 넣고, 마지막에 답글표기 -->
         <c:forEach varStatus="sts" begin="1" end="${b.level }">
@@ -121,14 +126,16 @@
         </td><td>${b.writer }</td><td><fmt:formatDate value="${b.regdte }"/></td><td>${b.readcnt }</td>
       </tr>
       </c:forEach>
-    </tbody>
+    </tbody> 
   </table>    
   <ul class="pagination justify-content-center" style="margin:20px 0;">
-  <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-  <c:forEach var="cnt" begin="1" end="${sch.pageCount }">
+  <li class="page-item">
+  	<a class="page-link" href="javascript:goPage(${sch.startBlock-1 })">Previous</a></li>
+  <c:forEach var="cnt" begin="${sch.startBlock }" end="${sch.endBlock }">
   		<li class="page-item ${sch.curPage==cnt?'active':'' }"><a class="page-link" href="javascript:goPage(${cnt })">${cnt }</a></li>
   </c:forEach>
-  <li class="page-item"><a class="page-link" href="#">Next</a></li>
+  <li class="page-item">
+  	<a class="page-link" href="javascript:goPage(${sch.endBlock+1 })">Next</a></li>
   </ul>
 </div>
 </body>

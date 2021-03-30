@@ -11,6 +11,11 @@ public class BoardSch {
 	private int curPage; // 클릭한 현재 페이지 번호 
 	private int start; // 페이지의 시작번호 
 	private int end; // 페이지의 마지막 번호 
+	// 3. block 처리 
+	private int blockSize; // 한번에 보여줄 block크기 
+	private int startBlock; // block의 시작번호 
+	private int endBlock;  // block의 마지막 번호 
+	
 	public String getSubject() {
 		return subject;
 	}
@@ -58,6 +63,24 @@ public class BoardSch {
 	}
 	public void setEnd(int end) {
 		this.end = end;
+	}
+	public int getBlockSize() {
+		return blockSize;
+	}
+	public void setBlockSize(int blockSize) {
+		this.blockSize = blockSize;
+	}
+	public int getStartBlock() {
+		return startBlock;
+	}
+	public void setStartBlock(int startBlock) {
+		this.startBlock = startBlock;
+	}
+	public int getEndBlock() {
+		return endBlock;
+	}
+	public void setEndBlock(int endBlock) {
+		this.endBlock = endBlock;
 	}
 	
 	
