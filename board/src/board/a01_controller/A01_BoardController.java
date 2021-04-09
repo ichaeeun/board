@@ -9,7 +9,9 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -33,8 +35,8 @@ public class A01_BoardController {
 	@RequestMapping(params="method=list")
 	public String boardList(@ModelAttribute("sch") BoardSch sch, Model d, HttpServletRequest request) {
 		// 세션 설정 
-		HttpSession session = request.getSession();
-		session.setAttribute("mem", new Member("himan","7777"));
+		// HttpSession session = request.getSession();
+		// session.setAttribute("mem", new Member("himan","7777"));
 		
 		d.addAttribute("boardList",service.boardList(sch));
 		return "a01_boardList";
@@ -98,6 +100,31 @@ public class A01_BoardController {
 		// 컨테이너 안에 선언되어 있는 viewer명 
 		return "downloadviewer";
 	}
+	// http://localhost:8080/board/board.do?method=login
+	@GetMapping(params="method=login")
+	public String login() {
+		return "a04_login";
+	}
+	@PostMapping(params="method=login")
+	public String login(Member mem, HttpServletRequest request) {
+		System.out.println("아이디: "+mem.getId());
+		Member ckDB = service.login(mem);
+		if(ckDB!=null){ // 해당 값이 있으면 
+			HttpSession session = request.getSession();
+			session.setAttribute("sesMem",ckDB);
+			request.setAttribute("loginSucc", "Y");
+		}else {
+			request.setAttribute("loginSucc", "N");
+		}
+		return "a04_login";
+	}
+	
+	@RequestMapping(params="method=logout")
+    public String logout(HttpServletRequest request){
+    	HttpSession session = request.getSession();
+    	session.invalidate();
+    	return "redirect:/board.do?method=login";
+    }
 }
 
 

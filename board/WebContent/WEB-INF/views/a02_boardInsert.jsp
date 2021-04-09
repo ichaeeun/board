@@ -24,6 +24,12 @@
 --%>
 //
    $(document).ready(function(){
+	   var sessId = "${sesMem.id}";
+		if(sessId==""){
+			alert("로그인이 필요합니다!\n로그인화면으로 이동");
+			location.href="${path}/board.do?method=login";
+		}	 
+	   
       $("#mainBtn").click(function(){
          location.href="${path}/board.do?method=list";
       });
@@ -80,10 +86,11 @@
          <th class="table-success">제목</th>
          <td>
          <form:input path="subject" class="form-control"/>
+         <%--<input id="subject" name="subject"  --%>
       </tr>
       <tr class="text-center">
          <th class="table-success">작성자</th>
-         <td><input type="text" name="writer" class="form-control" value="${mem.id}"/></td>
+         <td><input type="text" name="writer" class="form-control" value="${sesMem.id}" readonly /></td>
       </tr>  
       <tr class="text-center">
          <th class="table-success">내용</th>

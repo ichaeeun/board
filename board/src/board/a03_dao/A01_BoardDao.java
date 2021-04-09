@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import board.z01_vo.Board;
 import board.z01_vo.BoardFile;
 import board.z01_vo.BoardSch;
+import board.z01_vo.Member;
 
 @Repository 
 public interface A01_BoardDao {
@@ -38,4 +39,6 @@ public interface A01_BoardDao {
 	// 파일 삭제 처리 
 	public void deleteBoard(int no); 
 	public void deleteFile(int no);
+	
+	public Member login(Member mem);
 }

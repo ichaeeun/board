@@ -41,6 +41,16 @@
 		   $("[name=curPage]").val(1);
 		   $("form").submit();
 	   });
+	   
+	    var sessId = "${sesMem.id}";
+		if(sessId==""){
+			alert("로그인이 필요합니다!\n로그인화면으로 이동");
+			location.href="${path}/board.do?method=login";
+		}	
+		
+	   $("#logoutBtn").click(function(){
+		   location.href="${path}/board.do?method=logout";
+	   });
    });
    function goPage(page){
 	   // 1. 이전페이지 0 ==>1  
@@ -56,6 +66,8 @@
 </head>
 <div class="jumbotron text-center">
   <h2>게시판 초기 화면</h2>
+  <h3 class="text-left">${sesMem.id}님 로그인 중<button class="btn btn-warning" id="logoutBtn">로그아웃</button></h3>
+  
 </div>
 <div class="container">
 <form:form modelAttribute="sch" method="post">

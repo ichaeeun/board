@@ -6,6 +6,7 @@
 		<typeAlias alias="board" type="board.z01_vo.Board"/>
 		<typeAlias alias="boardfile" type="board.z01_vo.BoardFile"/>
 		<typeAlias alias="boardsch" type="board.z01_vo.BoardSch"/>
+		<typeAlias alias="member" type="board.z01_vo.Member"/>
 	</typeAliases>
 	
 	<mappers>

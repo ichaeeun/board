@@ -24,12 +24,18 @@
 --%>
 //
    $(document).ready(function(){
-	   var memId = "${mem.id}";
+	   var sessId = "${sesMem.id}";
+		if(sessId==""){
+			alert("로그인이 필요합니다!\n로그인화면으로 이동");
+			location.href="${path}/board.do?method=login";
+		}	
+	   
+	//   var memId = "${sesMem.id}";
 	   
 	   $("#uptBtn").click(function(){
 		   var writer = $("[name=writer]").val();
 	  //   alert(memId+":"+writer);
-	  	   if(writer==memId){
+	  	   if(writer==sessId){
 	  		   if(confirm("수정하시겠습니까?")){
 	  			   $("[name=proc]").val("upt");
 	  			   $("form").attr("action","${path}/board.do?method=update");
@@ -54,7 +60,7 @@
 	   $("#delBtn").click(function(){
 		   var writer = $("[name=writer]").val();
 	  //   alert(memId+":"+writer);
-	  	   if(writer==memId){
+	  	   if(writer==sessId){
 	  		   if(confirm("삭제하시겠습니까?")){
 	  			 $("[name=proc]").val("del");
 	  			   $("form").attr("action","${path}/board.do?method=delete");
@@ -148,7 +154,7 @@
      		<span class="input-group-text">제목</span>
      	</div>
      	 <input class="form-control" type="text" 
-          name="subject" value="${boarddetail.subject }">             
+          name="subject" value="${boarddetail.subject }" <c:if test="${sesMem.id!=boarddetail.writer }">readonly</c:if>>             
      </div>
       
      <div class="input-group mb-3">
@@ -173,7 +179,7 @@
      		<span class="input-group-text">내용</span>
      	</div>
      	 <textarea class="form-control" rows=10
-          name="content">${boarddetail.content }</textarea>
+          name="content"  <c:if test="${sesMem.id!=boarddetail.writer }">readonly</c:if>>${boarddetail.content }</textarea>
      </div>
       
      <c:set var="fcnt" value="${boarddetail.fileInfo.size() }"/>
@@ -183,10 +189,10 @@
      		<span class="input-group-text">첨부파일(${sts.count}/${fcnt})</span>
      	</div>
      	<!-- 다운로드할 파일 정보(기존 파일) -->
-     	<input class="form-control fileInfo" name="fnames" value="${finf.fname }"/>
+     	<input class="form-control fileInfo" name="fnames" value="${finf.fname }" />
      	 <div class="custom-file">
      		<!-- 변경할  파일정보(report ==> vo 의 property)(수정하여 업로드할 파일) -->
-	     	<input type="file" name="report" class="custom-file-input" id="file01"/>
+	     	<input type="file" name="report" class="custom-file-input" id="file01" />
 	     	<label class="custom-file-label" for="file01">
 	     	변경하려면 파일을 선택하세요!</label>
     	 </div>
